@@ -62,7 +62,7 @@ This plugin supports any hook files that are supported by git. That is, you can 
         "extra": {
             ...
             "required-viison-git-hooks": {
-                "vendor/some-package-containing-hooks": ["php-project"]
+                "vendor/some-package-containing-hooks": ["php-project"],
                 "vendor/another-package-containing-hooks": ["javascrip-project", "spell-checker"]
             },
             ...
