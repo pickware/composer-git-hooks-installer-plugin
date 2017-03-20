@@ -141,7 +141,7 @@ class GitHooksInstaller extends LibraryInstaller
         $installedHooks = $this->getInstalledGitHooks();
         foreach ($installedHooks as $hookType => &$hooks) {
             unset($hooks[$package->getName()]);
-            if (count($hooks)) {
+            if (count($hooks) === 0) {
                 // Remove the respective hook file
                 $hookPath = self::GIT_HOOKS_PATH . '/' . $hookType;
                 $this->filesystem->remove($hookPath);
