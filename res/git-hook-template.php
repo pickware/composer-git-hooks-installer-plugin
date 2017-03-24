@@ -11,11 +11,12 @@ foreach ($hookCollection[$hookType] as $packageName => $hooks) {
 }
 
 // Execute collected hooks
+$workingDir = getcwd();
 foreach ($flattenedHooks as $hookPath) {
     echo sprintf("Executing git %s hook '%s'...\n", $hookType, $hookPath);
     $output = array();
     $return = null;
-    exec(realpath(__DIR__ . '/' . $hookPath) . ' 2>&1', $output, $return);
+    exec(realpath(__DIR__ . '/' . $hookPath) . ' "' . $workingDir . '" 2>&1', $output, $return);
     if (count($output) > 0) {
         echo "\t" . implode("\n\t", $output) . "\n";
     }
