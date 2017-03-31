@@ -1,4 +1,5 @@
 <?php
+
 namespace VIISON\Composer;
 
 use Composer\Installer\LibraryInstaller;
@@ -82,10 +83,9 @@ class GitHooksInstaller extends LibraryInstaller
      */
     protected function installGitHooks(PackageInterface $package)
     {
-        if (!$this->packageHasInstallableGitHooks($package)) {
+        if (!$this->packageHasInstallableGitHooks($package) || !$this->ensureGitHooksDir()) {
             return;
         }
-        $this->ensureGitHooksDir();
 
         // Check the root package for required git hooks
         $rootPackageExtra = $this->composer->getPackage()->getExtra();
@@ -135,7 +135,9 @@ class GitHooksInstaller extends LibraryInstaller
      */
     protected function uninstallGitHooks(PackageInterface $package)
     {
-        $this->ensureGitHooksDir();
+        if (!$this->ensureGitHooksDir()) {
+            return;
+        }
 
         // Remove all hooks of this package from the collection of installed hooks
         $installedHooks = $this->getInstalledGitHooks();
@@ -158,7 +160,9 @@ class GitHooksInstaller extends LibraryInstaller
      */
     protected function saveGitHooks(array $gitHooks)
     {
-        $this->ensureGitHooksDir();
+        if (!$this->ensureGitHooksDir()) {
+            return;
+        }
         $this->saveGitHookCollection($gitHooks);
         // Generate required executable hook files
         $hookFileTemplate = file_get_contents(__DIR__ . '/../res/git-hook-template.php');
@@ -181,7 +185,9 @@ class GitHooksInstaller extends LibraryInstaller
      */
     protected function saveGitHookCollection(array $gitHooks)
     {
-        $this->ensureGitHooksDir();
+        if (!$this->ensureGitHooksDir()) {
+            return;
+        }
         $hookCollectionFilePath = self::GIT_HOOKS_PATH . '/viison-hooks.json';
         if (count($gitHooks) > 0) {
             // Save the git hooks collection on disk
@@ -238,7 +244,9 @@ class GitHooksInstaller extends LibraryInstaller
      */
     protected function getInstalledGitHooks()
     {
-        $this->ensureGitHooksDir();
+        if (!$this->ensureGitHooksDir()) {
+            return null;
+        }
 
         // Check for a hooks file
         $filePath = self::GIT_HOOKS_PATH . '/viison-hooks.json';
@@ -261,10 +269,11 @@ class GitHooksInstaller extends LibraryInstaller
     {
         // Validate git environment
         if (!is_dir('.git')) {
-            throw new \Exception('No ".git" directory found');
+            return false;
         }
 
         $this->filesystem->ensureDirectoryExists(self::GIT_HOOKS_PATH);
+        return true;
     }
 
     /**
@@ -281,7 +290,7 @@ class GitHooksInstaller extends LibraryInstaller
         $filePaths = array_diff(scandir($path), array('.', '..'));
         $hookFilePaths = array();
         foreach ($filePaths as $filename) {
-            $filePath = realpath($path . '/' .$filename);
+            $filePath = realpath($path . '/' . $filename);
             if (is_dir($filePath)) {
                 $hookFilePaths = array_merge($hookFilePaths, self::listHookFilesRecursively($filePath));
             } elseif (is_file($filePath) && in_array($filename, $whitelist)) {
