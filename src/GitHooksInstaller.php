@@ -165,7 +165,7 @@ class GitHooksInstaller extends LibraryInstaller
         }
         $this->saveGitHookCollection($gitHooks);
         // Generate required executable hook files
-        $hookFileTemplate = file_get_contents(__DIR__ . '/../res/git-hook-template.php');
+        $hookFileTemplate = file_get_contents(__DIR__ . '/../res/git-hook-template.sh');
         foreach ($gitHooks as $hookType => $hooks) {
             // Replace the git hook file of the current type
             $hookPath = self::GIT_HOOKS_PATH . '/' . $hookType;
