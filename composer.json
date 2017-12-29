@@ -1,5 +1,7 @@
 {
     "name": "viison/composer-git-hooks-installer-plugin",
+    "description": "A composer installer plugin that installs required git hooks from dependencies.",
+    "license": "MIT",
     "type": "composer-plugin",
     "require": {
         "composer-plugin-api": "^1.0"
