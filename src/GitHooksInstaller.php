@@ -7,6 +7,7 @@ use Composer\Json\JsonFile;
 use Composer\Package\PackageInterface;
 use Composer\Repository\InstalledRepositoryInterface;
 use Composer\Util\Silencer;
+use React\Promise\PromiseInterface;
 
 /**
  * @copyright Copyright (c) 2017 VIISON GmbH
@@ -49,8 +50,19 @@ class GitHooksInstaller extends LibraryInstaller
      */
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        parent::install($repo, $package);
+        $promise = parent::install($repo, $package);
+
+        if ($promise instanceof PromiseInterface) {
+            // Composer 2
+            return $promise->then(function () use ($package) {
+                $this->installGitHooks($package);
+            });
+        }
+
+        // Composer 1
         $this->installGitHooks($package);
+
+        return null;
     }
 
     /**
@@ -59,8 +71,19 @@ class GitHooksInstaller extends LibraryInstaller
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
         $this->uninstallGitHooks($initial);
-        parent::update($repo, $initial, $target);
+        $promise = parent::update($repo, $initial, $target);
+
+        if ($promise instanceof PromiseInterface) {
+            // Composer 2
+            return $promise->then(function () use ($target) {
+                $this->installGitHooks($target);
+            });
+        }
+
+        // Composer 1
         $this->installGitHooks($target);
+
+        return null;
     }
 
     /**
@@ -69,7 +92,8 @@ class GitHooksInstaller extends LibraryInstaller
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
         $this->uninstallGitHooks($package);
-        parent::uninstall($repo, $package);
+
+        return parent::uninstall($repo, $package);
     }
 
     /**

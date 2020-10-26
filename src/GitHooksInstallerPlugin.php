@@ -11,11 +11,32 @@ use Composer\Plugin\PluginInterface;
 class GitHooksInstallerPlugin implements PluginInterface
 {
     /**
+     * @var GitHooksInstaller|null
+     */
+    private $installer = null;
+
+    /**
      * @inheritdoc
      */
     public function activate(Composer $composer, IOInterface $io)
     {
-        $installer = new GitHooksInstaller($io, $composer);
-        $composer->getInstallationManager()->addInstaller($installer);
+        $this->installer = new GitHooksInstaller($io, $composer);
+        $composer->getInstallationManager()->addInstaller($this->installer);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        $composer->getInstallationManager()->removeInstaller($this->installer);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+        // Nothing to do
     }
 }
