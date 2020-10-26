@@ -18,4 +18,32 @@ class GitHooksInstallerPlugin implements PluginInterface
         $installer = new GitHooksInstaller($io, $composer);
         $composer->getInstallationManager()->addInstaller($installer);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function deactivate(Composer $composer, IOInterface $io)
+    {
+        $installationManager = $composer->getInstallationManager();
+        try {
+            $installer = $installationManager->getInstaller(GitHooksInstaller::GIT_HOOKS_PACKAGE_TYPE);
+        } catch (InvalidArgumentException $e) {
+            // Nothing to do if the installer is not registered.
+            return;
+        }
+
+        if (!($installer instanceof GitHooksInstaller)) {
+            // Not the installer that this plugin manages.
+            return;
+        }
+
+        $installationManager->removeInstaller($installer);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function uninstall(Composer $composer, IOInterface $io)
+    {
+    }
 }
